@@ -5,6 +5,30 @@ __pycache__/
 
 .venv/
 .env
+.env.*
+!.env.example
+
+# Secrets and credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.csr
+*.der
+*.kdbx
+id_rsa
+id_ed25519
+credentials
+secrets.*
+*.secret
+*.secrets
+
+# AWS and IaC local state
+.aws/
+*.tfstate
+*.tfstate.*
+.terraform/
 
 cdk.out/
 *.asset.json
