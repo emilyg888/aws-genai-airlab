@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.so
+*.dylib
+
+.venv/
+.env
+
+cdk.out/
+*.asset.json
+
+.pytest_cache/
+.mypy_cache/
+.coverage
+
+.DS_Store
