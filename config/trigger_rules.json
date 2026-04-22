@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "high_fraud_score",
+      "when": "fraud_score > 0.80",
+      "reason": "fraud_score above threshold"
+    },
+    {
+      "id": "high_value_amount",
+      "when": "amount > 10000",
+      "reason": "amount above threshold"
+    },
+    {
+      "id": "vip_customer",
+      "when": "customer_segment in ['high_value', 'vip']",
+      "reason": "elevated customer segment"
+    }
+  ],
+  "sampling": {
+    "baseline_invoke_rate": 0.01
+  }
+}

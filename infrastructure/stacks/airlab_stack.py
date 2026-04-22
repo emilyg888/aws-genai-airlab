@@ -14,6 +14,7 @@ from aws_cdk import (
     aws_lambda as lambda_,
     aws_logs as logs,
     aws_s3 as s3,
+    aws_ssm as ssm,
     custom_resources as cr,
 )
 from constructs import Construct
@@ -152,7 +153,18 @@ class AirLabStack(Stack):
                 removal_policy=RemovalPolicy.DESTROY,
             )
 
+        api_endpoint_param = ssm.StringParameter(
+            self,
+            "ApiEndpointParam",
+            parameter_name=os.getenv("API_ENDPOINT_SSM_PARAM", "/airlab/api-endpoint"),
+            string_value=api.url,
+            description="Invoke URL for the AirLab API (consumed by TriggerStack).",
+        )
+        self.api_endpoint_param_name = api_endpoint_param.parameter_name
+        self.tutor_method_arn = api.arn_for_execute_api(method="POST", path="/tutor", stage="lab")
+
         CfnOutput(self, "ApiEndpoint", value=api.url)
+        CfnOutput(self, "ApiEndpointParamName", value=api_endpoint_param.parameter_name)
         CfnOutput(self, "DocsBucketName", value=docs_bucket.bucket_name)
         CfnOutput(self, "VectorsBucketName", value=vectors_bucket.bucket_name)
         CfnOutput(self, "KnowledgeBaseId", value=knowledge_base_id)
