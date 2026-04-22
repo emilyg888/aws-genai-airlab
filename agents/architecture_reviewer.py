@@ -48,7 +48,13 @@ Return strict JSON:
 
 
 def _safe_parse_json(content: str) -> dict[str, Any] | None:
+    normalized = content.strip()
+    if normalized.startswith("```"):
+        lines = normalized.splitlines()
+        if len(lines) >= 3 and lines[-1].strip() == "```":
+            normalized = "\n".join(lines[1:-1]).strip()
+
     try:
-        return json.loads(content)
+        return json.loads(normalized)
     except json.JSONDecodeError:
         return None

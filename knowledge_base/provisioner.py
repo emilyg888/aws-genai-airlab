@@ -29,11 +29,10 @@ class KnowledgeBaseProvisioner:
 
         if self._dry_run:
             LOGGER.info("Dry-run mode active. Returning mock Knowledge Base identifiers.")
-            kb_id = physical_id or f"dryrun-{name[:24]}"
-            ds_id = f"dryrun-ds-{data_source_name[:20]}"
+            resource_id = physical_id or f"dryrun-{name[:24]}"
             return {
-                "PhysicalResourceId": kb_id,
-                "Data": {"KnowledgeBaseId": kb_id, "DataSourceId": ds_id},
+                "PhysicalResourceId": resource_id,
+                "Data": {"KnowledgeBaseId": "", "DataSourceId": ""},
             }
 
         # Note: S3 Vectors/KB API contract evolves; validate the payload for your region/API version.

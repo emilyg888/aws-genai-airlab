@@ -28,7 +28,7 @@ class AirLabConfig:
 
             model_id=os.getenv(
                 "BEDROCK_MODEL_ID",
-                "anthropic.claude-3-5-sonnet-20241022-v2:0"
+                "amazon.nova-lite-v1:0"
             ),
 
             embedding_model_id=os.getenv(

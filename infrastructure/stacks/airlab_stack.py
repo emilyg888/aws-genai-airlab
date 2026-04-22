@@ -116,7 +116,7 @@ class AirLabStack(Stack):
         knowledge_base_id = kb_resource.get_att_string("KnowledgeBaseId")
 
         shared_env = {
-            "BEDROCK_MODEL_ID": os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20241022-v2:0"),
+            "BEDROCK_MODEL_ID": os.getenv("BEDROCK_MODEL_ID", "amazon.nova-lite-v1:0"),
             "KNOWLEDGE_BASE_ID": knowledge_base_id,
         }
 

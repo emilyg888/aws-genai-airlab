@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from typing import Any
 
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
+
+KB_ID_PATTERN = re.compile(r"^[0-9A-Za-z]{1,10}$")
 
 
 class BedrockClient:
@@ -15,17 +18,23 @@ class BedrockClient:
         region_name: str | None = None,
         knowledge_base_id: str | None = None,
     ) -> None:
-        self.model_id = model_id or os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20241022-v2:0")
+        self.model_id = model_id or os.getenv("BEDROCK_MODEL_ID", "amazon.nova-lite-v1:0")
         self.region_name = region_name or os.getenv("AWS_REGION", "us-east-1")
         self.knowledge_base_id = knowledge_base_id or os.getenv("KNOWLEDGE_BASE_ID", "")
 
         self._runtime = boto3.client("bedrock-runtime", region_name=self.region_name)
         self._agent_runtime = boto3.client("bedrock-agent-runtime", region_name=self.region_name)
 
-    def generate_text(self, prompt: str, max_tokens: int = 900, temperature: float = 0.2) -> str:
+    def generate_text(
+        self,
+        prompt: str,
+        max_tokens: int = 900,
+        temperature: float = 0.2,
+        model_id: str | None = None,
+    ) -> str:
         try:
             response = self._runtime.converse(
-                modelId=self.model_id,
+                modelId=model_id or self.model_id,
                 messages=[{"role": "user", "content": [{"text": prompt}]}],
                 inferenceConfig={"maxTokens": max_tokens, "temperature": temperature},
             )
@@ -34,7 +43,7 @@ class BedrockClient:
             raise RuntimeError(f"Bedrock text generation failed: {exc}") from exc
 
     def retrieve_context(self, query: str, top_k: int = 4) -> list[str]:
-        if not self.knowledge_base_id:
+        if not self._has_usable_knowledge_base():
             return []
 
         try:
@@ -58,7 +67,7 @@ class BedrockClient:
         return contexts
 
     def retrieve_and_generate(self, query: str) -> dict[str, Any]:
-        if not self.knowledge_base_id:
+        if not self._has_usable_knowledge_base():
             raise ValueError("KNOWLEDGE_BASE_ID is not configured")
 
         try:
@@ -78,6 +87,9 @@ class BedrockClient:
 
     def _model_arn_from_model_id(self, model_id: str) -> str:
         return f"arn:aws:bedrock:{self.region_name}::foundation-model/{model_id}"
+
+    def _has_usable_knowledge_base(self) -> bool:
+        return bool(self.knowledge_base_id and KB_ID_PATTERN.match(self.knowledge_base_id))
 
     @staticmethod
     def dump_json(data: dict[str, Any]) -> str:

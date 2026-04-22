@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import aws_cdk as cdk
+from dotenv import load_dotenv
 
 from stacks.airlab_stack import AirLabStack
 
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 app = cdk.App()
 
